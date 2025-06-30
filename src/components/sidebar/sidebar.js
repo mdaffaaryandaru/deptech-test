@@ -1,18 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   HomeIcon,
   UsersIcon,
   ClockIcon,
   CalendarIcon,
-  CogIcon,
   BellIcon,
   UserCircleIcon,
   Bars3Icon,
   XMarkIcon,
+  ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 
 const menuItems = [
@@ -23,29 +24,31 @@ const menuItems = [
   },
   {
     name: 'Pegawai',
-    href: '/pegawai',
+    href: '/dashboard/employees',
     icon: UsersIcon,
   },
   {
     name: 'Kehadiran',
-    href: '/kehadiran',
+    href: '/dashboard/attendance',
     icon: ClockIcon,
   },
   {
     name: 'Manajemen Cuti',
-    href: '/cuti',
+    href: '/dashboard/leave',
     icon: CalendarIcon,
-  },
-  {
-    name: 'Pengaturan',
-    href: '/dashboard/pengaturan',
-    icon: CogIcon,
   },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/login');
+  };
 
   return (
     <>
@@ -64,9 +67,13 @@ export default function Sidebar() {
 
       {/* Sidebar overlay for mobile */}
       {isSidebarOpen && (
-        <div
+        <button
           className="lg:hidden fixed inset-0 z-40 bg-gray-600 bg-opacity-75"
           onClick={() => setIsSidebarOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setIsSidebarOpen(false);
+          }}
+          aria-label="Close sidebar"
         />
       )}
 
@@ -93,8 +100,10 @@ export default function Sidebar() {
               <UserCircleIcon className="w-6 h-6 text-gray-600" />
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">John Doe</p>
-              <p className="text-xs text-gray-500">Manajer SDM</p>
+              <p className="text-sm font-medium text-gray-900">
+                {user ? `${user.firstName} ${user.lastName}` : 'Admin'}
+              </p>
+              <p className="text-xs text-gray-500">Administrator</p>
             </div>
           </div>
         </div>
@@ -133,11 +142,15 @@ export default function Sidebar() {
         {/* Bottom section */}
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-gray-500">Aksi Cepat</span>
+            <span className="text-sm text-gray-500">Admin Panel</span>
             <BellIcon className="h-5 w-5 text-gray-400" />
           </div>
-          <button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md">
-            Absen Masuk/Keluar
+          <button 
+            onClick={handleLogout}
+            className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-md flex items-center justify-center"
+          >
+            <ArrowRightOnRectangleIcon className="w-4 h-4 mr-2" />
+            Logout
           </button>
         </div>
       </div>

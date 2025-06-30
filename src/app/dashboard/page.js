@@ -1,7 +1,12 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import apiClient from '../../lib/api';
 import {
   ChartBarIcon,
   UsersIcon,
   ClockIcon,
+  CalendarIcon,
   CurrencyDollarIcon,
 } from '@heroicons/react/24/outline';
 
@@ -68,6 +73,94 @@ const recentActivities = [
 ];
 
 export default function Dashboard() {
+  const [dashboardData, setDashboardData] = useState({
+    employees: { total: 0, data: [] },
+    leaves: { total: 0, stats: {} },
+    loading: true,
+  });
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      const [employeesRes, leavesRes, leaveStatsRes] = await Promise.all([
+        apiClient.getEmployees({ limit: 10 }),
+        apiClient.getLeaves({ limit: 10 }),
+        apiClient.getLeaveStats(),
+      ]);
+
+      setDashboardData({
+        employees: employeesRes,
+        leaves: leavesRes,
+        leaveStats: leaveStatsRes,
+        loading: false,
+      });
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+      setDashboardData(prev => ({ ...prev, loading: false }));
+    }
+  };
+
+  const getActivityTypeClass = (type) => {
+    switch (type) {
+      case 'leave': return 'bg-yellow-400';
+      case 'attendance': return 'bg-green-400';
+      case 'performance': return 'bg-blue-400';
+      default: return 'bg-gray-400';
+    }
+  };
+
+  const stats = [
+    {
+      name: 'Total Pegawai',
+      value: dashboardData.employees?.total || 0,
+      change: '+12%',
+      changeType: 'increase',
+      icon: UsersIcon,
+    },
+    {
+      name: 'Cuti Aktif',
+      value: dashboardData.leaveStats?.activeLeaves || 0,
+      change: 'Bulan ini',
+      changeType: 'neutral',
+      icon: CalendarIcon,
+    },
+    {
+      name: 'Total Cuti',
+      value: dashboardData.leaves?.total || 0,
+      change: 'Semua waktu',
+      changeType: 'neutral',
+      icon: ClockIcon,
+    },
+    {
+      name: 'Sisa Kuota Cuti',
+      value: `${dashboardData.leaveStats?.remainingDays || 0} hari`,
+      change: 'Rata-rata',
+      changeType: 'neutral',
+      icon: ChartBarIcon,
+    },
+  ];
+
+  if (dashboardData.loading) {
+    return (
+      <div className="p-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-64 mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={`loading-card-${i + 1}`} className="bg-white rounded-xl p-6 border">
+                <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-16 mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-32"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="p-6">
       <div className="mb-8">
@@ -108,11 +201,7 @@ export default function Dashboard() {
           <div className="space-y-4">
             {recentActivities.map((activity) => (
               <div key={activity.id} className="flex items-center space-x-4">
-                <div className={`w-2 h-2 rounded-full ${
-                  activity.type === 'leave' ? 'bg-yellow-400' :
-                  activity.type === 'attendance' ? 'bg-green-400' :
-                  activity.type === 'performance' ? 'bg-blue-400' : 'bg-gray-400'
-                }`} />
+                <div className={`w-2 h-2 rounded-full ${getActivityTypeClass(activity.type)}`} />
                 <div className="flex-1">
                   <p className="text-sm text-gray-900">
                     <span className="font-medium">{activity.user}</span> {activity.action}
