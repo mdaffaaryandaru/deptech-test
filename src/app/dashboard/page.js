@@ -7,141 +7,133 @@ import {
   UsersIcon,
   ClockIcon,
   CalendarIcon,
-  CurrencyDollarIcon,
 } from '@heroicons/react/24/outline';
-
-const stats = [
-  {
-    name: 'Total Pegawai',
-    value: '245',
-    change: '+12%',
-    changeType: 'increase',
-    icon: UsersIcon,
-  },
-  {
-    name: 'Hadir Hari Ini',
-    value: '198',
-    change: '80.8%',
-    changeType: 'increase',
-    icon: ClockIcon,
-  },
-  {
-    name: 'Gaji Bulanan',
-    value: 'Rp 18M',
-    change: '+5.4%',
-    changeType: 'increase',
-    icon: CurrencyDollarIcon,
-  },
-  {
-    name: 'Skor Kinerja',
-    value: '8.7/10',
-    change: '+0.3',
-    changeType: 'increase',
-    icon: ChartBarIcon,
-  },
-];
-
-const recentActivities = [
-  {
-    id: 1,
-    user: 'Sarah Johnson',
-    action: 'mengajukan permintaan cuti',
-    time: '2 jam yang lalu',
-    type: 'leave',
-  },
-  {
-    id: 2,
-    user: 'Mike Chen',
-    action: 'clock in',
-    time: '3 jam yang lalu',
-    type: 'attendance',
-  },
-  {
-    id: 3,
-    user: 'Emily Davis',
-    action: 'menyelesaikan evaluasi kinerja',
-    time: '5 jam yang lalu',
-    type: 'performance',
-  },
-  {
-    id: 4,
-    user: 'David Wilson',
-    action: 'memperbarui informasi profil',
-    time: '1 hari yang lalu',
-    type: 'profile',
-  },
-];
 
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState({
-    employees: { total: 0, data: [] },
-    leaves: { total: 0, stats: {} },
+    leaveStats: { 
+      totalEmployees: 0, 
+      totalLeaves: 0, 
+      totalLeaveDays: 0,
+      averageLeaveDaysPerEmployee: 0
+    },
     loading: true,
+    error: null,
   });
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (retryCount = 0) => {
     try {
-      const [employeesRes, leavesRes, leaveStatsRes] = await Promise.all([
-        apiClient.getEmployees({ limit: 10 }),
-        apiClient.getLeaves({ limit: 10 }),
+      setDashboardData(prev => ({ ...prev, loading: true, error: null }));
+      
+      const [employeesRes, leaveStatsRes] = await Promise.all([
+        apiClient.getEmployees({ page: 1, limit: 1 }), // Get total count from meta
         apiClient.getLeaveStats(),
       ]);
 
       setDashboardData({
-        employees: employeesRes,
-        leaves: leavesRes,
+        totalEmployees: employeesRes.meta?.total || 0,
         leaveStats: leaveStatsRes,
         loading: false,
+        error: null,
       });
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
-      setDashboardData(prev => ({ ...prev, loading: false }));
+      
+      // Retry logic
+      if (retryCount < 2) {
+        console.log(`Retrying... (${retryCount + 1}/2)`);
+        setTimeout(() => fetchDashboardData(retryCount + 1), 1000);
+        return;
+      }
+      
+      setDashboardData(prev => ({ 
+        ...prev, 
+        loading: false, 
+        error: error.message || 'Gagal memuat data dashboard'
+      }));
     }
   };
 
-  const getActivityTypeClass = (type) => {
-    switch (type) {
-      case 'leave': return 'bg-yellow-400';
-      case 'attendance': return 'bg-green-400';
-      case 'performance': return 'bg-blue-400';
-      default: return 'bg-gray-400';
-    }
+  const formatNumber = (num) => {
+    if (num === null || num === undefined) return '0';
+    return new Intl.NumberFormat('id-ID').format(num);
   };
 
   const stats = [
     {
       name: 'Total Pegawai',
-      value: dashboardData.employees?.total || 0,
-      change: '+12%',
-      changeType: 'increase',
+      value: formatNumber(dashboardData.totalEmployees || 0),
+      change: 'Terdaftar',
+      changeType: 'neutral',
       icon: UsersIcon,
     },
     {
-      name: 'Cuti Aktif',
-      value: dashboardData.leaveStats?.activeLeaves || 0,
-      change: 'Bulan ini',
+      name: 'Cuti Tahun Ini',
+      value: formatNumber(dashboardData.leaveStats?.totalLeaves || 0),
+      change: 'Permohonan',
       changeType: 'neutral',
       icon: CalendarIcon,
     },
     {
-      name: 'Total Cuti',
-      value: dashboardData.leaves?.total || 0,
-      change: 'Semua waktu',
+      name: 'Total Hari Cuti',
+      value: `${formatNumber(dashboardData.leaveStats?.totalLeaveDays || 0)} hari`,
+      change: 'Tahun ini',
       changeType: 'neutral',
       icon: ClockIcon,
     },
     {
-      name: 'Sisa Kuota Cuti',
-      value: `${dashboardData.leaveStats?.remainingDays || 0} hari`,
-      change: 'Rata-rata',
+      name: 'Rata-rata Cuti',
+      value: `${dashboardData.leaveStats?.averageLeaveDaysPerEmployee?.toFixed(1) || 0} hari`,
+      change: 'Per pegawai',
       changeType: 'neutral',
       icon: ChartBarIcon,
     },
   ];
+
+  const quickActions = [
+    {
+      title: 'Data Pegawai',
+      description: 'Kelola data pegawai',
+      icon: UsersIcon,
+      color: 'green',
+      href: '/dashboard/employees'
+    },
+    {
+      title: 'Manajemen Cuti',
+      description: 'Kelola permohonan cuti',
+      icon: CalendarIcon,
+      color: 'blue',
+      href: '/dashboard/leave'
+    },
+    {
+      title: 'Kehadiran',
+      description: 'Monitor kehadiran pegawai',
+      icon: ClockIcon,
+      color: 'purple',
+      href: '/dashboard/attendance'
+    },
+    {
+      title: 'Dashboard',
+      description: 'Lihat ringkasan data',
+      icon: ChartBarIcon,
+      color: 'orange',
+      href: '/dashboard'
+    }
+  ];
+
+  const getColorClasses = (color) => {
+    const colorMap = {
+      green: 'text-green-600 hover:bg-green-50',
+      blue: 'text-blue-600 hover:bg-blue-50',
+      purple: 'text-purple-600 hover:bg-purple-50',
+      orange: 'text-orange-600 hover:bg-orange-50'
+    };
+    return colorMap[color] || 'text-gray-600 hover:bg-gray-50';
+  };
 
   if (dashboardData.loading) {
     return (
@@ -161,11 +153,50 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  if (dashboardData.error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <div className="text-red-600 mb-4">
+            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-red-800 mb-2">Gagal memuat data</h3>
+          <p className="text-red-600 mb-4">{dashboardData.error}</p>
+          <button 
+            onClick={() => fetchDashboardData()}
+            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Coba Lagi
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Selamat datang kembali! Inilah yang terjadi di perusahaan Anda.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600 mt-2">Selamat datang kembali! Inilah yang terjadi di perusahaan Anda.</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={() => fetchDashboardData()}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+              disabled={dashboardData.loading}
+            >
+              <svg className={`w-4 h-4 ${dashboardData.loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>{dashboardData.loading ? 'Memuat...' : 'Refresh'}</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -185,59 +216,29 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="mt-4 flex items-center">
-              <span className={`text-sm font-medium text-green-600`}>
+              <span className={`text-sm font-medium text-gray-600`}>
                 {stat.change}
               </span>
-              <span className="text-sm text-gray-500 ml-1">dari bulan lalu</span>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activities */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Aktivitas Terbaru</h3>
-          <div className="space-y-4">
-            {recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-center space-x-4">
-                <div className={`w-2 h-2 rounded-full ${getActivityTypeClass(activity.type)}`} />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900">
-                    <span className="font-medium">{activity.user}</span> {activity.action}
-                  </p>
-                  <p className="text-xs text-gray-500">{activity.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
-              <ClockIcon className="w-6 h-6 text-blue-600 mb-2" />
-              <p className="font-medium text-gray-900">Clock In/Out</p>
-              <p className="text-xs text-gray-500">Track attendance</p>
+      {/* Quick Actions */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Quick Actions</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {quickActions.map((action) => (
+            <button
+              key={action.title}
+              onClick={() => window.location.href = action.href}
+              className={`p-6 border border-gray-200 rounded-lg transition-all duration-200 text-left group ${getColorClasses(action.color)}`}
+            >
+              <action.icon className={`w-8 h-8 mb-4 transition-colors ${action.color === 'green' ? 'text-green-600' : action.color === 'blue' ? 'text-blue-600' : action.color === 'purple' ? 'text-purple-600' : 'text-orange-600'}`} />
+              <p className="font-semibold text-gray-900 mb-2">{action.title}</p>
+              <p className="text-sm text-gray-500">{action.description}</p>
             </button>
-            <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
-              <UsersIcon className="w-6 h-6 text-green-600 mb-2" />
-              <p className="font-medium text-gray-900">Add Employee</p>
-              <p className="text-xs text-gray-500">Register new hire</p>
-            </button>
-            <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
-              <CurrencyDollarIcon className="w-6 h-6 text-purple-600 mb-2" />
-              <p className="font-medium text-gray-900">Process Payroll</p>
-              <p className="text-xs text-gray-500">Monthly payroll</p>
-            </button>
-            <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
-              <ChartBarIcon className="w-6 h-6 text-orange-600 mb-2" />
-              <p className="font-medium text-gray-900">View Reports</p>
-              <p className="text-xs text-gray-500">Analytics & insights</p>
-            </button>
-          </div>
+          ))}
         </div>
       </div>
     </div>
