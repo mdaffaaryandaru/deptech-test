@@ -34,6 +34,11 @@ const menuItems = [
     href: '/dashboard/leave',
     icon: CalendarIcon,
   },
+  {
+    name: 'Profile',
+    href: '/dashboard/profile',
+    icon: UserCircleIcon,
+  },
 ];
 
 export default function Sidebar() {
@@ -60,17 +65,17 @@ export default function Sidebar() {
 
       {/* User profile section */}
       <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center">
-          <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-            <UserCircleIcon className="w-6 h-6 text-gray-600" />
+        <Link href="/dashboard/profile" className="flex items-center hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors group">
+          <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center group-hover:bg-gray-400 transition-colors">
+            <UserCircleIcon className="w-6 h-6 text-gray-600 group-hover:text-gray-700" />
           </div>
           <div className="ml-3">
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-medium text-gray-900 group-hover:text-blue-700">
               {user ? `${user.firstName} ${user.lastName}` : 'Admin'}
             </p>
             <p className="text-xs text-gray-500">Administrator</p>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Navigation */}
