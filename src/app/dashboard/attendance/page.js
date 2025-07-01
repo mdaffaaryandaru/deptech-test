@@ -66,7 +66,7 @@ export default function AttendancePage() {
 
   if (attendanceData.loading) {
     return (
-      <div className="p-6">
+      <div className="p-4 lg:p-6">
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-64 mb-4"></div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -117,10 +117,10 @@ export default function AttendancePage() {
   ];
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Kehadiran & Cuti</h1>
-        <p className="text-gray-600 mt-2">Ringkasan kehadiran dan penggunaan cuti pegawai</p>
+    <div className="p-4 lg:p-6">
+      <div className="mb-6">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Kehadiran & Cuti</h1>
+        <p className="text-gray-600 mt-1">Ringkasan kehadiran dan penggunaan cuti pegawai</p>
       </div>
 
       {/* Stats Grid */}
@@ -144,30 +144,30 @@ export default function AttendancePage() {
       </div>
 
       {/* Employee Leave Summary Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="px-4 lg:px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">Ringkasan Cuti Pegawai</h3>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+        <div className="overflow-hidden">
+          <table className="table-responsive w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Pegawai
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="hidden sm:table-cell px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total Cuti Tahun Ini
+                <th className="hidden md:table-cell px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Total Cuti
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="hidden lg:table-cell px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Sisa Kuota
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="hidden xl:table-cell px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Cuti Terakhir
                 </th>
               </tr>
@@ -175,7 +175,7 @@ export default function AttendancePage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {attendanceData.employeesWithLeave.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={6} className="px-3 lg:px-6 py-12 text-center text-gray-500">
                     Tidak ada data pegawai
                   </td>
                 </tr>
@@ -189,26 +189,34 @@ export default function AttendancePage() {
 
                   return (
                     <tr key={employee.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {employee.firstName} {employee.lastName}
+                      <td className="px-3 lg:px-6 py-4">
+                        <div className="flex flex-col">
+                          <div className="text-sm font-medium text-gray-900">
+                            {employee.firstName} {employee.lastName}
+                          </div>
+                          <div className="sm:hidden text-xs text-gray-500 mt-1">
+                            {employee.email}
+                          </div>
+                          <div className="md:hidden text-xs text-gray-500">
+                            {usedDays}/{12} hari cuti
+                          </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{employee.email}</div>
+                      <td className="hidden sm:table-cell px-3 lg:px-6 py-4">
+                        <div className="text-sm text-gray-900 truncate max-w-xs">{employee.email}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="hidden md:table-cell px-3 lg:px-6 py-4">
                         <div className="text-sm text-gray-900">{usedDays} hari</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="hidden lg:table-cell px-3 lg:px-6 py-4">
                         <div className="text-sm text-gray-900">{remainingDays} hari</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 lg:px-6 py-4">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getLeaveStatusBadge(usedDays)}`}>
                           {getLeaveStatusText(usedDays)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="hidden xl:table-cell px-3 lg:px-6 py-4">
                         <div className="text-sm text-gray-900">
                           {lastLeave ? formatDate(lastLeave.startDate) : '-'}
                         </div>

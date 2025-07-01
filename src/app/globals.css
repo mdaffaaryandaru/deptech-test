@@ -5,13 +5,6 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -23,4 +16,49 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom styles for responsive tables */
+.table-responsive {
+  max-width: 100%;
+  table-layout: fixed;
+}
+
+.table-responsive th,
+.table-responsive td {
+  word-wrap: break-word;
+  overflow: hidden;
+  transition: padding 0.2s ease-in-out;
+}
+
+/* Sidebar specific adjustments */
+@media (min-width: 1024px) {
+  .sidebar-offset {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+}
+
+/* Smooth sidebar transitions */
+.sidebar-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Header shadow when scrolled */
+.header-shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Enhanced button hover effects */
+.toggle-button:hover {
+  transform: scale(1.05);
+}
+
+.toggle-button:active {
+  transform: scale(0.95);
 }

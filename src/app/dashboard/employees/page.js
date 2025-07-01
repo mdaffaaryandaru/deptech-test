@@ -71,16 +71,16 @@ export default function EmployeesPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <div className="flex justify-between items-center">
+    <div className="p-4 lg:p-6">
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Manajemen Pegawai</h1>
-            <p className="text-gray-600 mt-2">Kelola data pegawai perusahaan</p>
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Manajemen Pegawai</h1>
+            <p className="text-gray-600 mt-1">Kelola data pegawai perusahaan</p>
           </div>
           <Link
             href="/dashboard/employees/create"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center transition-colors"
           >
             <PlusIcon className="w-5 h-5 mr-2" />
             Tambah Pegawai
@@ -90,40 +90,42 @@ export default function EmployeesPage() {
 
       {/* Search */}
       <div className="mb-6">
-        <div className="relative">
+        <div className="relative max-w-md">
           <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Cari pegawai..."
             value={searchTerm}
             onChange={handleSearchChange}
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full max-w-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="overflow-hidden">
+          <table className="table-responsive w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Pegawai
+                <th className="px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center space-x-1">
+                    <span>Pegawai</span>
+                  </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="hidden sm:table-cell px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="hidden md:table-cell px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   No HP
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Jenis Kelamin
+                <th className="hidden lg:table-cell px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Gender
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="hidden xl:table-cell px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Alamat
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Aksi
                 </th>
               </tr>
@@ -132,32 +134,32 @@ export default function EmployeesPage() {
               {loading && (
                 Array.from({ length: 5 }, (_, i) => (
                   <tr key={`loading-${i + 1}`}>
-                    <td className="px-6 py-4">
+                    <td className="px-3 lg:px-6 py-4">
                       <div className="animate-pulse">
                         <div className="h-4 bg-gray-200 rounded w-32"></div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="hidden sm:table-cell px-3 lg:px-6 py-4">
+                      <div className="animate-pulse">
+                        <div className="h-4 bg-gray-200 rounded w-32"></div>
+                      </div>
+                    </td>
+                    <td className="hidden md:table-cell px-3 lg:px-6 py-4">
+                      <div className="animate-pulse">
+                        <div className="h-4 bg-gray-200 rounded w-24"></div>
+                      </div>
+                    </td>
+                    <td className="hidden lg:table-cell px-3 lg:px-6 py-4">
+                      <div className="animate-pulse">
+                        <div className="h-4 bg-gray-200 rounded w-16"></div>
+                      </div>
+                    </td>
+                    <td className="hidden xl:table-cell px-3 lg:px-6 py-4">
                       <div className="animate-pulse">
                         <div className="h-4 bg-gray-200 rounded w-40"></div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="animate-pulse">
-                        <div className="h-4 bg-gray-200 rounded w-28"></div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="animate-pulse">
-                        <div className="h-4 bg-gray-200 rounded w-20"></div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="animate-pulse">
-                        <div className="h-4 bg-gray-200 rounded w-48"></div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 lg:px-6 py-4">
                       <div className="animate-pulse flex space-x-2">
                         <div className="h-8 w-8 bg-gray-200 rounded"></div>
                         <div className="h-8 w-8 bg-gray-200 rounded"></div>
@@ -168,7 +170,7 @@ export default function EmployeesPage() {
               )}
               {!loading && employees.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={6} className="px-3 lg:px-6 py-12 text-center text-gray-500">
                     Tidak ada data pegawai
                   </td>
                 </tr>
@@ -176,38 +178,46 @@ export default function EmployeesPage() {
               {!loading && employees.length > 0 && (
                 employees.map((employee) => (
                   <tr key={employee.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
+                    <td className="px-3 lg:px-6 py-4">
+                      <div className="flex flex-col">
                         <div className="text-sm font-medium text-gray-900">
                           {employee.firstName} {employee.lastName}
                         </div>
+                        <div className="sm:hidden text-xs text-gray-500 mt-1">
+                          {employee.email}
+                        </div>
+                        <div className="md:hidden text-xs text-gray-500">
+                          {employee.phone}
+                        </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{employee.email}</div>
+                    <td className="hidden sm:table-cell px-3 lg:px-6 py-4">
+                      <div className="text-sm text-gray-900 truncate max-w-xs">{employee.email}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="hidden md:table-cell px-3 lg:px-6 py-4">
                       <div className="text-sm text-gray-900">{employee.phone}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="hidden lg:table-cell px-3 lg:px-6 py-4">
                       <div className="text-sm text-gray-900">{getGenderLabel(employee.gender)}</div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="hidden xl:table-cell px-3 lg:px-6 py-4">
                       <div className="text-sm text-gray-900 max-w-xs truncate">
                         {employee.address}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
+                    <td className="px-3 lg:px-6 py-4 text-sm font-medium">
+                      <div className="flex space-x-1">
                         <Link
                           href={`/dashboard/employees/${employee.id}/edit`}
                           className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Edit"
                         >
                           <PencilIcon className="w-4 h-4" />
                         </Link>
                         <button
                           onClick={() => handleDelete(employee.id)}
                           className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Hapus"
                         >
                           <TrashIcon className="w-4 h-4" />
                         </button>

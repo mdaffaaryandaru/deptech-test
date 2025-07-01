@@ -177,12 +177,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
+    <div className="p-4 lg:p-6">
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600 mt-2">Selamat datang kembali! Inilah yang terjadi di perusahaan Anda.</p>
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600 mt-1">Selamat datang kembali! Inilah yang terjadi di perusahaan Anda.</p>
           </div>
           <div className="flex items-center space-x-4">
             <button 
